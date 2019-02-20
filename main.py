@@ -1,3 +1,5 @@
+import itertools
+
 import matplotlib
 from sklearn.datasets import make_blobs
 
@@ -13,6 +15,7 @@ from sklearn.gaussian_process.kernels import RBF
 from sklearn.naive_bayes import GaussianNB
 from sklearn.decomposition import PCA
 from sklearn.metrics import confusion_matrix
+from pandas import DataFrame
 
 
 def NaiveBayes(dataset, show=False):
@@ -20,8 +23,10 @@ def NaiveBayes(dataset, show=False):
     X, labels = dataset
     new_labels = gnb.fit(X, labels).predict(X)
 
-    print(confusion_matrix(labels, new_labels))
-
+    conf = confusion_matrix(labels, new_labels)
+    conf = conf / np.linalg.norm(conf)
+    plt.matshow(conf)
+    plt.show()
     if show:
         for i in range(len(X[0])):
             if i >= 3:
@@ -43,7 +48,11 @@ def GaussianClassifier(dataset, show=False):
     classifier.score(X, labels)
     new_labels = classifier.predict(X)
 
-    print(confusion_matrix(labels, new_labels))
+    conf = confusion_matrix(labels, new_labels)
+    conf = conf / np.linalg.norm(conf)
+
+    plt.matshow(conf)
+    plt.show()
 
     if show:
         for i in range(len(X[0])):
@@ -64,6 +73,11 @@ def pca():
     pca = PCA(n_components=4)
     pca.fit(X, labels)
     print(pca.score(X, labels))
+    df1 = DataFrame(data=X)
+    plt.matshow(df1.corr())
+    df2 = DataFrame(data=pca.transform(X))
+    plt.matshow(df2.corr())
+    plt.show()
 
 
 def paint(x, y, label):
@@ -79,12 +93,14 @@ def paint(x, y, label):
     scat = ax.scatter(x, y, c=label, s=10, cmap=cmap, norm=norm)
     cb = plt.colorbar(scat, spacing='proportional', ticks=bounds)
 
+
 if __name__ == "__main__":
+    pca()
     func = [
         NaiveBayes,
-        GaussianClassifier
+        GaussianClassifier,
+
     ]
     for x in func:
         print(x)
         x(load_breast_cancer(return_X_y=True), False)
-cd
